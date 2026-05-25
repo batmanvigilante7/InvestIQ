@@ -23,6 +23,7 @@ export default function ThesisDetailPage() {
   const theses = useStore((s) => s.theses);
   const convictions = useStore((s) => s.convictions);
   const signals = useStore((s) => s.signals);
+  const events = useStore((s) => s.events);
   const updateThesis = useStore((s) => s.updateThesis);
   const deleteThesis = useStore((s) => s.deleteThesis);
   const updateAssumption = useStore((s) => s.updateAssumption);
@@ -32,6 +33,9 @@ export default function ThesisDetailPage() {
   const thesis = theses.find((t) => t.id === params.id);
   const thesisConvictions = convictions.filter((c) => c.thesisId === params.id);
   const thesisSignals = signals.filter((s) => s.thesisId === params.id);
+  const thesisEvents = events
+    .filter((e) => e.relatedThesisIds.includes(params.id as string))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const [showAddAssumption, setShowAddAssumption] = useState(false);
   const [showConvictionUpdate, setShowConvictionUpdate] = useState(false);
@@ -235,6 +239,105 @@ export default function ThesisDetailPage() {
           </div>
         </section>
       )}
+
+      {/* Living Updates Feed */}
+      <section className="mb-8">
+        <h2 className="mb-4 text-lg font-semibold text-white">Living Updates</h2>
+        {thesisEvents.length > 0 ? (
+          <div className="space-y-3">
+            {thesisEvents.map((event) => (
+              <div
+                key={event.id}
+                className="rounded-xl border border-slate-800 bg-slate-900/30 p-4 transition-colors hover:border-slate-700"
+              >
+                <div className="mb-2 flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-2">
+                    <span className={`mt-0.5 inline-flex h-2 w-2 rounded-full ${
+                      event.impactScore > 30 ? "bg-brand-green" : event.impactScore < -30 ? "bg-brand-red" : "bg-brand-yellow"
+                    }`} />
+                    <div>
+                      <p className="text-sm font-medium text-white">{event.title}</p>
+                      <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
+                        <span>{event.source}</span>
+                        <span>·</span>
+                        <span>{event.createdAt}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span className={`text-xs font-mono ${event.impactScore > 0 ? "text-brand-green" : event.impactScore < 0 ? "text-brand-red" : "text-slate-400"}`}>
+                    {event.impactScore > 0 ? "+" : ""}{event.impactScore}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-400">{event.reasoning}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-slate-800 bg-slate-900/30 p-6 text-center">
+            <p className="text-sm text-slate-400">No events yet for this thesis.</p>
+            <p className="mt-1 text-xs text-slate-500">
+              Log market events to make this thesis come alive.
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* Thesis Health Meter */}
+      <section className="mb-8">
+        <h2 className="mb-4 text-lg font-semibold text-white">Thesis Health</h2>
+        <div className="rounded-xl border border-slate-800 bg-slate-900/30 p-5">
+          <div className="grid gap-4 sm:grid-cols-3">
+            {/* Event Impact */}
+            <div className="text-center">
+              <p className="text-xs text-slate-500 mb-1">Event Impact</p>
+              <p className={`text-2xl font-bold ${
+                thesisEvents.length === 0 ? "text-slate-400" :
+                thesisEvents.reduce((sum, e) => sum + e.impactScore, 0) > 0 ? "text-brand-green" :
+                thesisEvents.reduce((sum, e) => sum + e.impactScore, 0) < 0 ? "text-brand-red" : "text-brand-yellow"
+              }`}>
+                {thesisEvents.length === 0 ? "—" :
+                 thesisEvents.reduce((sum, e) => sum + e.impactScore, 0) > 0 ? "Strengthening" :
+                 thesisEvents.reduce((sum, e) => sum + e.impactScore, 0) < 0 ? "Weakening" : "Stable"}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                {thesisEvents.length} events tracked
+              </p>
+            </div>
+
+            {/* Assumption Health */}
+            <div className="text-center">
+              <p className="text-xs text-slate-500 mb-1">Assumption Health</p>
+              <p className={`text-2xl font-bold ${
+                invalidated > validated ? "text-brand-red" :
+                weakening > holding ? "text-brand-yellow" : "text-brand-green"
+              }`}>
+                {invalidated > validated ? "Fragile" :
+                 weakening > holding ? "Caution" : "Healthy"}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                {validated} validated, {invalidated} invalidated
+              </p>
+            </div>
+
+            {/* Conviction Trend */}
+            <div className="text-center">
+              <p className="text-xs text-slate-500 mb-1">Conviction Trend</p>
+              <p className={`text-2xl font-bold ${
+                thesisConvictions.length < 2 ? "text-slate-400" :
+                thesisConvictions[thesisConvictions.length - 1].value > thesisConvictions[0].value ? "text-brand-green" :
+                thesisConvictions[thesisConvictions.length - 1].value < thesisConvictions[0].value ? "text-brand-red" : "text-brand-yellow"
+              }`}>
+                {thesisConvictions.length < 2 ? "—" :
+                 thesisConvictions[thesisConvictions.length - 1].value > thesisConvictions[0].value ? "Rising" :
+                 thesisConvictions[thesisConvictions.length - 1].value < thesisConvictions[0].value ? "Falling" : "Stable"}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                {thesis.confidence}% current confidence
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* AI Insights placeholder */}
       <section className="mb-8 rounded-xl border border-slate-800 bg-slate-900/30 p-6">

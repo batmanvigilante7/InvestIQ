@@ -145,6 +145,26 @@ export interface Position {
   addedAt: string;
 }
 
+// --- Stage 2: Event Layer ---
+
+export type EventCategory = "earnings" | "news" | "macro" | "regulatory" | "geopolitical" | "sector" | "company";
+export type EventSentiment = "positive" | "negative" | "neutral" | "mixed";
+
+export interface MarketEvent {
+  id: string;
+  title: string;
+  summary: string;
+  source: string;
+  category: EventCategory;
+  sentiment: EventSentiment;
+  entities: string[];        // company names, tickers, sectors
+  relatedThesisIds: string[];
+  relatedAssumptionIds: string[];
+  impactScore: number;       // -100 to +100
+  reasoning: string;         // why this matters
+  createdAt: string;
+}
+
 // --- Cognitive Alerts ---
 
 export interface CognitiveAlert {
@@ -164,6 +184,7 @@ export interface FolioState {
   theses: Thesis[];
   convictions: Conviction[];
   signals: Signal[];
+  events: MarketEvent[];
   decisions: Decision[];
   outcomes: Outcome[];
   risks: Risk[];
@@ -186,6 +207,10 @@ export interface FolioState {
 
   // Signal actions
   addSignal: (signal: Omit<Signal, "id" | "timestamp">) => void;
+
+  // Event actions
+  addEvent: (event: Omit<MarketEvent, "id" | "createdAt">) => void;
+  linkEventToThesis: (eventId: string, thesisId: string, assumptionIds?: string[]) => void;
 
   // Decision actions
   addDecision: (decision: Decision) => void;

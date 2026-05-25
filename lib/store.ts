@@ -8,6 +8,7 @@ import type {
   Assumption,
   Conviction,
   Signal,
+  MarketEvent,
   Decision,
   Outcome,
   Risk,
@@ -15,7 +16,7 @@ import type {
   Position,
   CognitiveAlert,
 } from "@/types";
-import { mockTheses, mockConvictions, mockSignals } from "./mockData";
+import { mockTheses, mockConvictions, mockSignals, mockEvents } from "./mockData";
 
 export const useStore = create<FolioState>()(
   persist(
@@ -24,6 +25,7 @@ export const useStore = create<FolioState>()(
       theses: mockTheses as Thesis[],
       signals: mockSignals as Signal[],
       convictions: mockConvictions as Conviction[],
+      events: mockEvents as MarketEvent[],
       decisions: [] as Decision[],
       outcomes: [] as Outcome[],
       risks: [] as Risk[],
@@ -134,6 +136,32 @@ export const useStore = create<FolioState>()(
               timestamp: new Date().toISOString().split("T")[0],
             },
           ],
+        })),
+
+      // ─── Events ───
+      addEvent: (event) =>
+        set((state) => ({
+          events: [
+            ...state.events,
+            {
+              ...event,
+              id: `e-${Date.now()}`,
+              createdAt: new Date().toISOString().split("T")[0],
+            },
+          ],
+        })),
+
+      linkEventToThesis: (eventId, thesisId, assumptionIds = []) =>
+        set((state) => ({
+          events: state.events.map((e) =>
+            e.id === eventId
+              ? {
+                  ...e,
+                  relatedThesisIds: [...new Set([...e.relatedThesisIds, thesisId])],
+                  relatedAssumptionIds: [...new Set([...e.relatedAssumptionIds, ...assumptionIds])],
+                }
+              : e
+          ),
         })),
 
       // ─── Decisions ───

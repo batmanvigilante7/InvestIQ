@@ -44,6 +44,12 @@ export default function Sidebar() {
       icon: "📡",
       count: signals.length,
     },
+    {
+      href: "/events",
+      label: "Events",
+      icon: "⚡",
+      count: 0,
+    },
   ];
 
   return (
