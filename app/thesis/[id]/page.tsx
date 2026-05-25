@@ -41,6 +41,7 @@ export default function ThesisDetailPage() {
   const [showConvictionUpdate, setShowConvictionUpdate] = useState(false);
   const [newConviction, setNewConviction] = useState(thesis?.confidence ?? 50);
   const [convictionReasoning, setConvictionReasoning] = useState("");
+  const [convictionEmotion, setConvictionEmotion] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
@@ -89,9 +90,11 @@ export default function ThesisDetailPage() {
       thesisId: thesis.id,
       value: newConviction,
       reasoning: convictionReasoning || "Manual confidence update",
+      emotionalState: convictionEmotion ? (convictionEmotion as any) : undefined,
     });
     setShowConvictionUpdate(false);
     setConvictionReasoning("");
+    setConvictionEmotion("");
   };
 
   const handleStartEdit = () => {
@@ -211,6 +214,24 @@ export default function ThesisDetailPage() {
             <div className="mb-4">
               <label className="mb-2 block text-sm text-slate-400">Why did it change?</label>
               <textarea value={convictionReasoning} onChange={(e) => setConvictionReasoning(e.target.value)} placeholder="e.g., Q1 earnings confirmed margin expansion thesis..." rows={2} className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-white placeholder-slate-500 outline-none focus:border-brand-green" />
+            </div>
+            <div className="mb-4">
+              <label className="mb-2 block text-sm text-slate-400">How are you feeling?</label>
+              <div className="flex flex-wrap gap-2">
+                {["calm", "confident", "anxious", "euphoric", "fearful", "neutral"].map((emotion) => (
+                  <button
+                    key={emotion}
+                    onClick={() => setConvictionEmotion(convictionEmotion === emotion ? "" : emotion)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                      convictionEmotion === emotion
+                        ? "bg-brand-green/20 text-brand-green border border-brand-green/30"
+                        : "bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500"
+                    }`}
+                  >
+                    {emotion}
+                  </button>
+                ))}
+              </div>
             </div>
             <button onClick={handleConvictionUpdate} className="rounded-lg bg-brand-green px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-400">Save Update</button>
           </div>

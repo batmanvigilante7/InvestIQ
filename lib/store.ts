@@ -20,7 +20,7 @@ import { mockTheses, mockConvictions, mockSignals, mockEvents } from "./mockData
 
 export const useStore = create<FolioState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       // Data
       theses: mockTheses as Thesis[],
       signals: mockSignals as Signal[],
@@ -109,9 +109,17 @@ export const useStore = create<FolioState>()(
       // ─── Conviction ───
       addConviction: (conviction) =>
         set((state) => {
+          const thesisConvictions = state.convictions.filter((c) => c.thesisId === conviction.thesisId);
+          const previousValue = thesisConvictions.length > 0
+            ? thesisConvictions[thesisConvictions.length - 1].value
+            : undefined;
+          const delta = previousValue !== undefined ? conviction.value - previousValue : undefined;
+
           const newConviction: Conviction = {
             ...conviction,
             id: `c-${Date.now()}`,
+            previousValue,
+            delta,
             recordedAt: new Date().toISOString().split("T")[0],
           };
           const updatedTheses = state.theses.map((t) =>
@@ -124,6 +132,19 @@ export const useStore = create<FolioState>()(
             theses: updatedTheses,
           };
         }),
+
+      getConvictionStability: (thesisId) => {
+        const thesisConvictions = get().convictions.filter((c) => c.thesisId === thesisId);
+        if (thesisConvictions.length < 3) return "stable";
+        const recent = thesisConvictions.slice(-5);
+        const deltas = recent.map((c) => Math.abs(c.delta ?? 0));
+        const avgDelta = deltas.reduce((sum, d) => sum + d, 0) / deltas.length;
+        const latestTrend = recent[recent.length - 1].delta ?? 0;
+        if (avgDelta > 10) return "volatile";
+        if (latestTrend < -5) return "declining";
+        if (latestTrend > 5) return "rising";
+        return "stable";
+      },
 
       // ─── Signals ───
       addSignal: (signal) =>

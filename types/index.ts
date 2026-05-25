@@ -82,8 +82,23 @@ export interface Conviction {
   id: string;
   thesisId: string;
   value: number;
+  previousValue?: number;
+  delta?: number;
   reasoning?: string;
+  emotionalState?: EmotionalState;
+  triggeredByEventId?: string;
   recordedAt: string;
+}
+
+export interface ConvictionDelta {
+  id: string;
+  thesisId: string;
+  previousScore: number;
+  newScore: number;
+  delta: number;
+  reasonSummary: string;
+  emotionalState?: EmotionalState;
+  createdAt: string;
 }
 
 // --- Stage 4: Decision Layer ---
@@ -204,6 +219,7 @@ export interface FolioState {
 
   // Conviction actions
   addConviction: (conviction: Omit<Conviction, "id" | "recordedAt">) => void;
+  getConvictionStability: (thesisId: string) => "stable" | "volatile" | "declining" | "rising";
 
   // Signal actions
   addSignal: (signal: Omit<Signal, "id" | "timestamp">) => void;
