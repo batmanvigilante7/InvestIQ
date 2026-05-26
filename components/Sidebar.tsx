@@ -2,125 +2,99 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useStore } from "@/lib/store";
+import {
+  Home,
+  FileText,
+  Briefcase,
+  Brain,
+  Shield,
+  BookOpen,
+  Plus,
+  Search,
+} from "lucide-react";
 
-export default function Sidebar() {
+const navItems = [
+  { href: "/home", label: "Home", icon: Home },
+  { href: "/theses", label: "Theses", icon: FileText },
+  { href: "/portfolio", label: "Portfolio", icon: Briefcase },
+  { href: "/behavior", label: "Behavior", icon: Brain },
+  { href: "/governance", label: "Governance", icon: Shield },
+  { href: "/memory", label: "Memory", icon: BookOpen },
+];
+
+export default function Sidebar({
+  onCommandPaletteOpen,
+}: {
+  onCommandPaletteOpen?: () => void;
+}) {
   const pathname = usePathname();
-  const theses = useStore((s) => s.theses);
-  const signals = useStore((s) => s.signals);
-
-  if (pathname === "/") return null;
-
-  const avgConfidence = Math.round(
-    theses.reduce((acc, t) => acc + t.confidence, 0) / theses.length
-  );
-
-  const navItems = [
-    { href: "/dashboard", label: "All Theses", icon: "📊" },
-    {
-      href: "/dashboard?status=active",
-      label: "Active",
-      icon: "🟢",
-      count: theses.filter((t) => t.status === "active").length,
-    },
-    {
-      href: "/dashboard?status=conviction",
-      label: "Conviction",
-      icon: "🔥",
-      count: theses.filter((t) => t.status === "conviction").length,
-    },
-    {
-      href: "/dashboard?status=reviewing",
-      label: "Reviewing",
-      icon: "🔍",
-      count: theses.filter((t) => t.status === "reviewing").length,
-    },
-  ];
-
-  const bottomNavItems = [
-    {
-      href: "/signals",
-      label: "Signals",
-      icon: "📡",
-      count: signals.length,
-    },
-    {
-      href: "/events",
-      label: "Events",
-      icon: "⚡",
-      count: 0,
-    },
-  ];
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 hidden w-56 border-r border-slate-800 bg-slate-950 p-4 lg:block">
-      <div className="mb-6">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-          Theses
-        </p>
-        <nav className="flex flex-col gap-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
-            >
-              <span className="flex items-center gap-3">
-                <span>{item.icon}</span>
-                {item.label}
-              </span>
-              {item.count !== undefined && item.count > 0 && (
-                <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-500">
-                  {item.count}
-                </span>
-              )}
-            </Link>
-          ))}
-        </nav>
+    <aside className="fixed left-0 top-0 bottom-0 z-40 hidden w-[260px] flex-col border-r border-border bg-bg-1 lg:flex">
+      {/* Brand */}
+      <div className="flex items-center gap-3 border-b border-border p-6">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent font-bold text-white text-sm">
+          F
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-text-0">FolioAI</p>
+          <p className="text-[10px] text-text-2">v17 Economic Digital Twin</p>
+        </div>
       </div>
 
-      <div className="mb-6 border-t border-slate-800 pt-4">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-          Intelligence
-        </p>
-        <nav className="flex flex-col gap-1">
-          {bottomNavItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
-            >
-              <span className="flex items-center gap-3">
-                <span>{item.icon}</span>
-                {item.label}
-              </span>
-              {item.count !== undefined && item.count > 0 && (
-                <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-500">
-                  {item.count}
-                </span>
-              )}
-            </Link>
-          ))}
-        </nav>
-      </div>
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        {/* Search trigger */}
+        <button
+          onClick={onCommandPaletteOpen}
+          className="mb-4 flex w-full items-center gap-3 rounded-lg border border-border bg-bg-2 px-3 py-2 text-sm text-text-2 transition-colors hover:border-border-hover hover:text-text-1"
+        >
+          <Search size={14} />
+          <span>Search</span>
+          <kbd className="ml-auto rounded border border-border bg-bg-4 px-1.5 py-0.5 text-[10px] text-text-2">
+            /
+          </kbd>
+        </button>
 
-      <div className="border-t border-slate-800 pt-4">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-          Quick Stats
-        </p>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between text-slate-400">
-            <span>Total Theses</span>
-            <span className="text-white">{theses.length}</span>
-          </div>
-          <div className="flex justify-between text-slate-400">
-            <span>Avg Confidence</span>
-            <span className="text-brand-green">{avgConfidence}%</span>
-          </div>
-          <div className="flex justify-between text-slate-400">
-            <span>Signals</span>
-            <span className="text-white">{signals.length}</span>
-          </div>
+        <ul className="space-y-0.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                    isActive
+                      ? "bg-accent-dim text-accent"
+                      : "text-text-1 hover:bg-bg-3 hover:text-text-0"
+                  }`}
+                >
+                  <Icon size={16} />
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="mt-4 border-t border-border pt-4">
+          <Link
+            href="/new-thesis"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+          >
+            <Plus size={16} />
+            New Thesis
+          </Link>
+        </div>
+      </nav>
+
+      {/* Footer */}
+      <div className="border-t border-border p-4">
+        <div className="flex items-center gap-2 text-[10px] text-text-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-success" style={{ animation: "pulse 2s ease-in-out infinite" }} />
+          AI Active
+          <span className="ml-auto">Stage 17</span>
         </div>
       </div>
     </aside>

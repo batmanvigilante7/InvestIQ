@@ -9,6 +9,7 @@ export type ThesisStatus =
   | "active"
   | "reviewing"
   | "conviction"
+  | "paused"
   | "abandoned";
 
 export type AssumptionStatus =
@@ -50,12 +51,16 @@ export interface Risk {
 export interface Thesis {
   id: string;
   title: string;
+  ticker?: string;
+  sector?: string;
   description: string;
   confidence: number;
   assumptions: Assumption[];
   risks: Risk[];
   tags: string[];
   status: ThesisStatus;
+  allocation?: number;
+  pnl?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -146,7 +151,7 @@ export interface Narrative {
   lastUpdatedAt: string;
 }
 
-// --- Stage 4: Portfolio Layer ---
+// --- Portfolio Layer ---
 
 export interface Position {
   id: string;
@@ -160,7 +165,7 @@ export interface Position {
   addedAt: string;
 }
 
-// --- Stage 2: Event Layer ---
+// --- Event Layer ---
 
 export type EventCategory = "earnings" | "news" | "macro" | "regulatory" | "geopolitical" | "sector" | "company";
 export type EventSentiment = "positive" | "negative" | "neutral" | "mixed";
@@ -172,11 +177,11 @@ export interface MarketEvent {
   source: string;
   category: EventCategory;
   sentiment: EventSentiment;
-  entities: string[];        // company names, tickers, sectors
+  entities: string[];
   relatedThesisIds: string[];
   relatedAssumptionIds: string[];
-  impactScore: number;       // -100 to +100
-  reasoning: string;         // why this matters
+  impactScore: number;
+  reasoning: string;
   createdAt: string;
 }
 
@@ -190,6 +195,42 @@ export interface CognitiveAlert {
   evidence: string[];
   dismissed: boolean;
   createdAt: string;
+}
+
+// --- Behavior & Governance ---
+
+export interface BehaviorPattern {
+  id: string;
+  type: string;
+  severity: "info" | "warning" | "alert";
+  title: string;
+  description: string;
+  time: string;
+}
+
+export interface CognitiveBias {
+  name: string;
+  level: number; // 0-100
+}
+
+export interface GovernanceRule {
+  id: string;
+  name: string;
+  description: string;
+  active: boolean;
+  triggeredAt?: string;
+}
+
+export interface RationalityScore {
+  label: string;
+  value: number; // 0-100
+}
+
+export interface BehavioralLesson {
+  id: string;
+  icon: string;
+  text: string;
+  category: "win" | "loss" | "lesson";
 }
 
 // --- Store Shape ---
@@ -206,6 +247,11 @@ export interface FolioState {
   narratives: Narrative[];
   positions: Position[];
   cognitiveAlerts: CognitiveAlert[];
+  behaviorPatterns: BehaviorPattern[];
+  cognitiveBiases: CognitiveBias[];
+  governanceRules: GovernanceRule[];
+  rationalityScores: RationalityScore[];
+  behavioralLessons: BehavioralLesson[];
 
   // Thesis actions
   addThesis: (thesis: Omit<Thesis, "id" | "createdAt" | "updatedAt">) => void;
@@ -245,4 +291,7 @@ export interface FolioState {
 
   // Alert actions
   dismissAlert: (id: string) => void;
+
+  // Governance actions
+  toggleRule: (id: string) => void;
 }

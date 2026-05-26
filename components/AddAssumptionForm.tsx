@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useStore } from "@/lib/store";
 import type { Assumption, AssumptionImpact, AssumptionCategory } from "@/types";
+import { Plus } from "lucide-react";
 
 interface AddAssumptionFormProps {
   thesisId: string;
@@ -34,31 +35,31 @@ export default function AddAssumptionForm({
   };
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/30 p-5">
+    <div className="rounded-xl border border-border bg-bg-1 p-5">
       <div className="space-y-3">
         <div>
-          <label className="mb-1.5 block text-sm text-slate-400">What needs to be true?</label>
+          <label className="mb-1.5 block text-sm text-text-2">What needs to be true?</label>
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             placeholder="e.g., AI training compute demand grows >40% YoY"
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-white placeholder-slate-500 outline-none focus:border-brand-green"
+            className="w-full rounded-lg border border-border bg-bg-2 px-4 py-2 text-sm text-text-0 placeholder-text-2 outline-none focus:border-accent transition-colors"
             autoFocus
           />
         </div>
         <div className="flex gap-3">
           <div className="flex-1">
-            <label className="mb-1.5 block text-sm text-slate-400">Impact</label>
-            <select value={impact} onChange={(e) => setImpact(e.target.value as AssumptionImpact)} className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-brand-green">
+            <label className="mb-1.5 block text-sm text-text-2">Impact</label>
+            <select value={impact} onChange={(e) => setImpact(e.target.value as AssumptionImpact)} className="w-full rounded-lg border border-border bg-bg-2 px-3 py-2 text-sm text-text-0 outline-none focus:border-accent">
               <option value="high">High</option>
               <option value="medium">Medium</option>
               <option value="low">Low</option>
             </select>
           </div>
           <div className="flex-1">
-            <label className="mb-1.5 block text-sm text-slate-400">Category</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value as AssumptionCategory)} className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-brand-green">
+            <label className="mb-1.5 block text-sm text-text-2">Category</label>
+            <select value={category} onChange={(e) => setCategory(e.target.value as AssumptionCategory)} className="w-full rounded-lg border border-border bg-bg-2 px-3 py-2 text-sm text-text-0 outline-none focus:border-accent">
               <option value="demand">Demand</option>
               <option value="supply">Supply</option>
               <option value="macro">Macro</option>
@@ -70,10 +71,10 @@ export default function AddAssumptionForm({
           </div>
         </div>
         <div className="flex gap-2 pt-1">
-          <button onClick={handleSubmit} disabled={!text.trim()} className="rounded-lg bg-brand-green px-4 py-1.5 text-sm font-semibold text-slate-950 hover:bg-emerald-400 disabled:opacity-50">
-            Add Assumption
+          <button onClick={handleSubmit} disabled={!text.trim()} className="inline-flex items-center gap-1 rounded-lg bg-accent px-4 py-1.5 text-sm font-semibold text-white hover:bg-accent/90 disabled:opacity-40 transition-colors">
+            <Plus className="h-3.5 w-3.5" /> Add Assumption
           </button>
-          <button onClick={onComplete} className="rounded-lg border border-slate-700 px-4 py-1.5 text-sm text-slate-400 hover:text-white">
+          <button onClick={onComplete} className="rounded-lg border border-border px-4 py-1.5 text-sm text-text-2 hover:text-text-0 transition-colors">
             Cancel
           </button>
         </div>

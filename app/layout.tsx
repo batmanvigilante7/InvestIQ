@@ -3,13 +3,14 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
+import { ToastProvider } from "@/components/ui/Toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FolioAI — AI-Powered Investing Workspace",
+  title: "FolioAI — Investing Companion",
   description:
-    "Build, track, and refine investment theses with clarity. Turn ideas into structured conviction.",
+    "Intelligent portfolio management with AI-powered insights. Track convictions, analyze behavior, manage governance.",
 };
 
 export default function RootLayout({
@@ -19,10 +20,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-slate-950 text-slate-200 antialiased`}>
-        <Navbar />
-        <Sidebar />
-        <main className="pt-16 lg:pl-56">{children}</main>
+      <body className={inter.className}>
+        <ToastProvider>
+          <Navbar />
+          <Sidebar />
+          <main className="pt-14 pb-20 lg:pt-0 lg:pb-0 lg:pl-[260px] min-h-screen">
+            {children}
+          </main>
+        </ToastProvider>
       </body>
     </html>
   );

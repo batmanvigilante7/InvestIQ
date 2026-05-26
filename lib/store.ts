@@ -2,21 +2,19 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type {
-  FolioState,
-  Thesis,
-  Assumption,
-  Conviction,
-  Signal,
-  MarketEvent,
-  Decision,
-  Outcome,
-  Risk,
-  Narrative,
-  Position,
-  CognitiveAlert,
-} from "@/types";
-import { mockTheses, mockConvictions, mockSignals, mockEvents } from "./mockData";
+import type { FolioState, Thesis, Assumption, Conviction, Signal, MarketEvent, Decision, Outcome, Risk, Narrative, Position, CognitiveAlert } from "@/types";
+import {
+  mockTheses,
+  mockConvictions,
+  mockSignals,
+  mockEvents,
+  mockPositions,
+  mockBehaviorPatterns,
+  mockCognitiveBiases,
+  mockGovernanceRules,
+  mockRationalityScores,
+  mockBehavioralLessons,
+} from "./mockData";
 
 export const useStore = create<FolioState>()(
   persist(
@@ -30,10 +28,15 @@ export const useStore = create<FolioState>()(
       outcomes: [] as Outcome[],
       risks: [] as Risk[],
       narratives: [] as Narrative[],
-      positions: [] as Position[],
+      positions: mockPositions as Position[],
       cognitiveAlerts: [] as CognitiveAlert[],
+      behaviorPatterns: mockBehaviorPatterns,
+      cognitiveBiases: mockCognitiveBiases,
+      governanceRules: mockGovernanceRules,
+      rationalityScores: mockRationalityScores,
+      behavioralLessons: mockBehavioralLessons,
 
-      // ─── Thesis CRUD ───
+      // Thesis CRUD
       addThesis: (thesis) =>
         set((state) => ({
           theses: [
@@ -64,7 +67,7 @@ export const useStore = create<FolioState>()(
           decisions: state.decisions.filter((d) => d.thesisId !== id),
         })),
 
-      // ─── Assumption CRUD ───
+      // Assumption CRUD
       addAssumption: (thesisId, assumption) =>
         set((state) => ({
           theses: state.theses.map((t) =>
@@ -106,7 +109,7 @@ export const useStore = create<FolioState>()(
           ),
         })),
 
-      // ─── Conviction ───
+      // Conviction
       addConviction: (conviction) =>
         set((state) => {
           const thesisConvictions = state.convictions.filter((c) => c.thesisId === conviction.thesisId);
@@ -146,7 +149,7 @@ export const useStore = create<FolioState>()(
         return "stable";
       },
 
-      // ─── Signals ───
+      // Signals
       addSignal: (signal) =>
         set((state) => ({
           signals: [
@@ -159,7 +162,7 @@ export const useStore = create<FolioState>()(
           ],
         })),
 
-      // ─── Events ───
+      // Events
       addEvent: (event) =>
         set((state) => ({
           events: [
@@ -185,19 +188,19 @@ export const useStore = create<FolioState>()(
           ),
         })),
 
-      // ─── Decisions ───
+      // Decisions
       addDecision: (decision) =>
         set((state) => ({
           decisions: [...state.decisions, decision],
         })),
 
-      // ─── Outcomes ───
+      // Outcomes
       addOutcome: (outcome) =>
         set((state) => ({
           outcomes: [...state.outcomes, outcome],
         })),
 
-      // ─── Risks ───
+      // Risks
       addRisk: (risk) =>
         set((state) => ({
           risks: [...state.risks, risk],
@@ -208,7 +211,7 @@ export const useStore = create<FolioState>()(
           risks: state.risks.map((r) => (r.id === id ? { ...r, ...updates } : r)),
         })),
 
-      // ─── Positions ───
+      // Positions
       addPosition: (position) =>
         set((state) => ({
           positions: [...state.positions, position],
@@ -226,11 +229,19 @@ export const useStore = create<FolioState>()(
           positions: state.positions.filter((p) => p.id !== id),
         })),
 
-      // ─── Alerts ───
+      // Alerts
       dismissAlert: (id) =>
         set((state) => ({
           cognitiveAlerts: state.cognitiveAlerts.map((a) =>
             a.id === id ? { ...a, dismissed: true } : a
+          ),
+        })),
+
+      // Governance
+      toggleRule: (id) =>
+        set((state) => ({
+          governanceRules: state.governanceRules.map((r) =>
+            r.id === id ? { ...r, active: !r.active } : r
           ),
         })),
     }),
